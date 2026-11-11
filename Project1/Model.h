@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -27,9 +28,16 @@ public:
         loadModel(path);
     }
 
-    void Draw(Shader& shader) {
-        for (unsigned int i = 0; i < meshes.size(); i++)
+    // Новая функция Draw с массивом матриц для каждой части
+    void Draw(Shader& shader, const vector<glm::mat4>& modelMatrices) {
+        for (unsigned int i = 0; i < meshes.size(); i++) {
+            glm::mat4 currentModel = glm::mat4(1.0f);
+            if (i < modelMatrices.size()) {
+                currentModel = modelMatrices[i];
+            }
+            shader.setMat4("model", glm::value_ptr(currentModel));
             meshes[i].Draw(shader);
+        }
     }
 
 private:
